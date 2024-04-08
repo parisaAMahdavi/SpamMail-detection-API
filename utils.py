@@ -5,6 +5,9 @@ import torch
 import re
 import string
 
+def get_labels(args):
+    return [label.strip() for label in open(os.path.join(args.data_dir, 'labels.txt'), 'r', encoding='utf-8')]
+
 
 def cleaning_method(text):
     """text data preprocessing."""
@@ -21,7 +24,7 @@ def cleaning_method(text):
     text = text.encode('ascii', 'ignore').decode('utf-8')
     
     # Remove punctuation - can be adjusted depending on the need
-    text = re.sub('[%s]' % re.escape(string.punctuation),' ',text)
+    # text = re.sub('[%s]' % re.escape(string.punctuation),' ',text)
     
     # Remove extra spaces and tabs
     text = re.sub(r'\s+', ' ', text).strip()
@@ -31,13 +34,12 @@ def cleaning_method(text):
 
 def convert_data_to_features(text, tokenizer, max_sequence_len):
 
-    encodings_dict = tokenizer('<|startoftext|>'+ text + '<|endoftext|>', return_tensors="pt", truncation=True, max_length=max_sequence_len, padding="max_length")
+    encodings_dict = tokenizer(text, truncation=True, max_length=max_sequence_len, padding="max_length")
+    return encodings_dict['input_ids'], encodings_dict['attention_mask']
 
-    features = {'input_ids':torch.tensor(encodings_dict['input_ids']), 
-                       'attn_masks': torch.tensor(encodings_dict['attention_mask'])}
-
-    return features
-
-def load_tokenizer(model_name):
-    return GPT2Tokenizer.from_pretrained(model_name, bos_token='<|startoftext|>', pad_token='<|pad|>')
-
+def load_tokenizer(args):
+    # if args.do_train :
+    tokenizer = GPT2Tokenizer.from_pretrained(args.model_name, bos_token='<|startoftext|>', pad_token='<|pad|>')
+    # elif args.do_train:
+    #     tokenizer = GPT2Tokenizer.from_pretrained(args.model_dir)
+    return tokenizer

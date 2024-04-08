@@ -152,7 +152,6 @@ ham
 ham
 ham
 ham
-spam
 ham
 ham
 spam
@@ -180,7 +179,6 @@ ham
 spam
 spam
 ham
-spam
 ham
 spam
 ham
@@ -294,7 +292,6 @@ ham
 ham
 ham
 spam
-spam
 ham
 spam
 ham
@@ -361,7 +358,6 @@ spam
 ham
 ham
 ham
-spam
 ham
 ham
 spam
@@ -1129,7 +1125,6 @@ spam
 ham
 ham
 spam
-spam
 ham
 ham
 spam
@@ -1274,7 +1269,6 @@ spam
 ham
 ham
 ham
-spam
 spam
 spam
 spam
@@ -1367,7 +1361,6 @@ ham
 ham
 spam
 ham
-spam
 ham
 ham
 spam
@@ -1931,7 +1924,6 @@ ham
 ham
 ham
 ham
-spam
 ham
 spam
 ham
@@ -2182,7 +2174,6 @@ ham
 ham
 ham
 ham
-spam
 spam
 ham
 ham
@@ -2536,7 +2527,6 @@ spam
 ham
 ham
 ham
-spam
 ham
 ham
 spam
@@ -2663,7 +2653,6 @@ spam
 spam
 ham
 ham
-spam
 ham
 ham
 spam
@@ -2678,7 +2667,6 @@ ham
 ham
 ham
 spam
-spam
 ham
 spam
 spam
@@ -2901,7 +2889,6 @@ ham
 ham
 ham
 ham
-spam
 ham
 ham
 spam
@@ -3004,7 +2991,6 @@ spam
 ham
 ham
 ham
-spam
 ham
 spam
 ham
@@ -3496,7 +3482,6 @@ ham
 spam
 ham
 spam
-ham
 ham
 ham
 ham
@@ -3608,7 +3593,6 @@ ham
 ham
 spam
 ham
-spam
 ham
 ham
 ham
@@ -4081,7 +4065,6 @@ spam
 ham
 spam
 spam
-spam
 ham
 spam
 spam
@@ -4746,7 +4729,6 @@ spam
 spam
 ham
 ham
-spam
 ham
 ham
 ham

@@ -6,9 +6,8 @@ import torch
 from transformers import AdamW, get_linear_schedule_with_warmup, GPT2ForSequenceClassification
 from sklearn.metrics import classification_report, accuracy_score
 from utils import get_labels
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-eval_results = []
-
 
 def train(args, model, train_dataloader,val_dataloader, device, tokenizer):
     

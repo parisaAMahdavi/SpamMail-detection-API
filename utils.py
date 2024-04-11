@@ -3,7 +3,15 @@ import os
 import numpy as np
 import torch
 import re
+import random
 import string
+
+def set_seed(args):
+    random.seed(1234)
+    np.random.seed(1234)
+    torch.manual_seed(1234)
+    if args.cuda and torch.cuda.is_available():
+        torch.cuda.manual_seed_all(1234)
 
 def get_labels(args):
     return [label.strip() for label in open(os.path.join(args.data_dir, 'labels.txt'), 'r', encoding='utf-8')]

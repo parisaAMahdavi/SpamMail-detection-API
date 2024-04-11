@@ -1,8 +1,10 @@
 from torch.utils.data import Dataset, DataLoader, random_split
 import os
+import logging
 import torch
 from utils import cleaning_method, convert_data_to_features, get_labels
 from sklearn.preprocessing import LabelEncoder
+logger = logging.getLogger(__name__)
 
 
 class SpamEmailDataset(Dataset):
@@ -33,30 +35,28 @@ class SpamEmailDataset(Dataset):
 
         self.data = self.data
         self._encode_labels()
+        self._encode_samples()
 
     def _encode_labels(self):
         self.labels = self.label_encoder.fit_transform(self.labels)
-        self.labels = self.labels
-
-
+    def _encode_samples(self):
+        for i,sample in enumerate(self.data):
+          cleaned = cleaning_method(sample)        
+          id, mask = convert_data_to_features(cleaned, self.tokenizer, self.max_seq_len)
+          self.input_ids.append(id)
+          self.attn_masks.append(mask)
     def __len__(self):
         return len(self.data)
-
-
     def __getitem__(self, idx):
 
-        sample = self.data[idx]
+        id_tensor = torch.tensor(self.input_ids[idx])
+        mask_tensor = torch.tensor(self.attn_masks[idx])
         label = self.labels[idx]
-        
-        sample = cleaning_method(sample)
-        
-        id, mask = convert_data_to_features(sample, self.tokenizer, self.max_seq_len)
-
         label_tensor = torch.tensor(label, dtype=torch.long)
 
-        return torch.tensor(id), torch.tensor(mask), label_tensor
+        return id_tensor, mask_tensor, label_tensor
 
-def load_data(args, tokenizer, mode):
+def load_data(args, tokenizer):
 
     dataset = SpamEmailDataset(args, tokenizer=tokenizer)
     train_size = int(0.7*len(dataset))
@@ -65,11 +65,8 @@ def load_data(args, tokenizer, mode):
     train_dataset, val_dataset, test_dataset = random_split(dataset, [train_size, val_size, test_size])         
 
     test_dataloader = DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False)
+    train_dataloader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True)
+    val_dataloader = DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False)
+    return train_dataloader, val_dataloader, test_dataloader
 
-    if mode == 'train':
-        train_dataloader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True)
-        val_dataloader = DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False)
-        return train_dataloader, val_dataloader, test_dataloader
-    else:
-        return test_dataloader
 

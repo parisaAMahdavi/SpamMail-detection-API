@@ -62,7 +62,7 @@ def train(args, model, train_dataloader,val_dataloader, device, tokenizer):
             model.zero_grad()
             global_step += 1
 
-            if global_step % 3 == 0:
+            if global_step % 50 == 0:
                 eval_results.append(evaluate(args, mode="dev", model=model, device=device, val_dataloader=val_dataloader))
 
             logits = logits.detach().cpu().numpy()
@@ -74,7 +74,7 @@ def train(args, model, train_dataloader,val_dataloader, device, tokenizer):
     save_model(args, model, tokenizer)
     return global_step, tr_loss / global_step
 
-def evaluate(args, mode, device, model, val_dataloader=None, test_dataloader=None):
+def evaluate(args, mode, device, model=None, val_dataloader=None, test_dataloader=None):
     if mode == 'test':
         dataset = test_dataloader
         model = load_model(args, device)

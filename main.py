@@ -3,16 +3,11 @@ import torch
 from torch.utils.data import Dataset, DataLoader
 import argparse
 import logging
-import re
-import string
-import os
-from utils import load_tokenizer, set_seed
+from utils import load_tokenizer, set_seed, encode_labels
 from data_loader import SpamEmailDataset, load_data
 from trainer import train, evaluate, load_model
 from app import GPT2Deployer
-import transformers
 import numpy as np
-import json
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -21,25 +16,33 @@ def main(args):
     set_seed(args)
     tokenizer = load_tokenizer(args)
     device = "cuda" if torch.cuda.is_available() and args.cuda else "cpu"
-    train_data, dev_data, test_data = load_data(args, tokenizer)
-
-
-    if args.do_train:
-      model = GPT2ForSequenceClassification.from_pretrained("gpt2", num_labels=args.num_calss)
-      model.resize_token_embeddings(len(tokenizer))
-      model.config.pad_token_id = tokenizer.pad_token_id
-      model.config.bos_token_id = tokenizer.bos_token_id
-      model.to(device)
-      gstep, gloss = train(args, model, train_data,dev_data, device, tokenizer)
-      results = evaluate(args, mode='test', device=device, test_dataloader=test_data)
-
-    elif args.do_test:
-      test_results = evaluate(args, mode='test', device=device, test_dataloader=test_data)
-
+    
+    if args.do_pred:
+        model = load_model(args, device)
+        label_dict = encode_labels(args)[1]
+        api = GPT2Deployer(model, tokenizer, args.max_seq_len, device, label_dict)
+        api.run_server()
     else:
-      model = load_model(args, device)
-      api = GPT2Deployer(model, tokenizer, args.max_seq_len)
-      api.run_server()
+
+        dataset = SpamEmailDataset(args, tokenizer=tokenizer)
+        train_data, dev_data, test_data = load_data(args,dataset)
+
+        if args.do_train:
+            
+            model = GPT2ForSequenceClassification.from_pretrained("gpt2", num_labels=args.num_calss)
+            model.resize_token_embeddings(len(tokenizer))
+            model.config.pad_token_id = tokenizer.pad_token_id
+            model.config.bos_token_id = tokenizer.bos_token_id
+            model.to(device)
+            gstep, gloss = train(args, model, train_data,dev_data, device, tokenizer)
+            results = evaluate(args, mode='test', device=device, test_dataloader=test_data)
+
+
+        if args.do_test:
+
+            test_results = evaluate(args, mode='test', device=device, test_dataloader=test_data)
+
+    
 
 def parse_args():
     # Create the parser
@@ -60,6 +63,7 @@ def parse_args():
     parser.add_argument("--cuda", action="store_false", help="using CUDA when available")
     parser.add_argument("--do_train",  action="store_true", help="Whether to run training.")
     parser.add_argument("--do_test", action="store_true", help="Whether to run eval on the test set.")
+    parser.add_argument("--do_pred", action="store_true", help="Whether to run prediction")
     
 
     return parser.parse_args()

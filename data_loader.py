@@ -1,8 +1,9 @@
-from torch.utils.data import Dataset, DataLoader, random_split
+from torch.utils.data import Dataset, DataLoader, SubsetRandomSampler
 import os
+import random
 import logging
 import torch
-from utils import cleaning_method, convert_data_to_features, get_labels
+from utils import cleaning_method, convert_data_to_features, encode_labels
 from sklearn.preprocessing import LabelEncoder
 logger = logging.getLogger(__name__)
 
@@ -19,7 +20,7 @@ class SpamEmailDataset(Dataset):
 
         self.data_path = args.data_dir
         self.input_text_file = 'mails.txt'
-        self.labels = get_labels(args)
+        self.labels = encode_labels(args)[0]
         self.tokenizer = tokenizer
         self.max_seq_len = args.max_seq_len
         self.label_encoder = LabelEncoder()
@@ -34,11 +35,8 @@ class SpamEmailDataset(Dataset):
                 self.data.append(line.strip())   
 
         self.data = self.data
-        self._encode_labels()
         self._encode_samples()
 
-    def _encode_labels(self):
-        self.labels = self.label_encoder.fit_transform(self.labels)
     def _encode_samples(self):
         for i,sample in enumerate(self.data):
           cleaned = cleaning_method(sample)        
@@ -56,17 +54,31 @@ class SpamEmailDataset(Dataset):
 
         return id_tensor, mask_tensor, label_tensor
 
-def load_data(args, tokenizer):
+def load_data(args, dataset):
 
-    dataset = SpamEmailDataset(args, tokenizer=tokenizer)
-    train_size = int(0.7*len(dataset))
-    val_size = int(0.15*len(dataset))
-    test_size =  len(dataset) - train_size - val_size
-    train_dataset, val_dataset, test_dataset = random_split(dataset, [train_size, val_size, test_size])         
+    indices = list(range(len(dataset)))
+    random.shuffle(indices)
 
-    test_dataloader = DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False)
-    train_dataloader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True)
-    val_dataloader = DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False)
-    return train_dataloader, val_dataloader, test_dataloader
+    # Calculate sizes
+    train_size = int(0.7 * len(indices))
+    val_size = int(0.15 * len(indices))
+    test_size = len(indices) - train_size - val_size
+
+    # Split indices
+    train_indices = indices[:train_size]
+    val_indices = indices[train_size:train_size + val_size]
+    test_indices = indices[train_size + val_size:]
+
+    # Create SubsetRandomSampler
+    train_sampler = SubsetRandomSampler(train_indices)
+    val_sampler = SubsetRandomSampler(val_indices)
+    test_sampler = SubsetRandomSampler(test_indices)
+
+    # Create DataLoader with the specified samplers
+    train_loader = DataLoader(dataset, batch_size=args.batch_size, sampler=train_sampler)
+    val_loader = DataLoader(dataset, batch_size=args.batch_size, sampler=val_sampler)
+    test_loader = DataLoader(dataset, batch_size=args.batch_size, sampler=test_sampler)
+
+    return train_loader, val_loader, test_loader
 
 

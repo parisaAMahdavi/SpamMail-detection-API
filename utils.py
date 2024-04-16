@@ -1,10 +1,10 @@
 from transformers import GPT2Tokenizer
+from sklearn.preprocessing import LabelEncoder
 import os
 import numpy as np
 import torch
 import re
 import random
-import string
 
 def set_seed(args):
     random.seed(1234)
@@ -16,6 +16,11 @@ def set_seed(args):
 def get_labels(args):
     return [label.strip() for label in open(os.path.join(args.data_dir, 'labels.txt'), 'r', encoding='utf-8')]
 
+def encode_labels(args):
+    label_encoder = LabelEncoder()
+    encoded_labels = label_encoder.fit_transform(get_labels(args))
+    dic_labels = dict(zip(encoded_labels, get_labels(args)))
+    return encoded_labels, dic_labels
 
 def cleaning_method(text):
     """text data preprocessing."""
@@ -46,8 +51,8 @@ def convert_data_to_features(text, tokenizer, max_sequence_len):
     return encodings_dict['input_ids'], encodings_dict['attention_mask']
 
 def load_tokenizer(args):
-    # if args.do_train :
-    tokenizer = GPT2Tokenizer.from_pretrained(args.model_name, bos_token='<|startoftext|>', pad_token='<|pad|>')
-    # elif args.do_train:
-    #     tokenizer = GPT2Tokenizer.from_pretrained(args.model_dir)
+    if args.do_train :
+        tokenizer = GPT2Tokenizer.from_pretrained(args.model_name, bos_token='<|startoftext|>', pad_token='<|pad|>')
+    else:
+        tokenizer = GPT2Tokenizer.from_pretrained(args.model_dir)
     return tokenizer

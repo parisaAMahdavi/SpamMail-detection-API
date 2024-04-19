@@ -1,6 +1,5 @@
 from transformers import GPT2Tokenizer, GPT2ForSequenceClassification
 import torch
-from torch.utils.data import Dataset, DataLoader
 import argparse
 import logging
 from utils import load_tokenizer, set_seed, encode_labels

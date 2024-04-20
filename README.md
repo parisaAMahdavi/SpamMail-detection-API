@@ -4,9 +4,9 @@ This project focuses on fine-tuning the GPT-2 model to classify emails as spam o
 
 ## Features
 
-    - Fine-tuned GPT-2 model for email classification.
-    - REST API built with Flask for deployment.
-    - Docker containerization for seamless deployment and scalability.
+    * Fine-tuned GPT-2 model for email classification.
+    * REST API built with Flask for deployment.
+    * Docker containerization for seamless deployment and scalability.
 
 ## Getting Started
 
@@ -31,4 +31,4 @@ python3 main.py --do_train --do_test --data_dir 'path/to/the/data' --model_dir '
 1. Build docker image
 ` docker build -t spam-mail-detection .`
 2. Run the docker container
-` docker container run --d --p 8080:8080 spam-mail-detection `
+` docker container run --detach --publish 8000:8000 spam-mail-detection `

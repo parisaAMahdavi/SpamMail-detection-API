@@ -26,8 +26,6 @@ python3 main.py --do_train --do_test --data_dir 'path/to/the/data' --model_dir '
 
 2. Send a POST request to the `/predict` endpoint with a piece of text as email content:
 
-bash `curl -X POST -F "image=@/path/to/image.jpg" http://localhost:5000/classify`
-
 ### Containerize
 
 1. Build docker image

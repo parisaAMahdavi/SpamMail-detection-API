@@ -10,9 +10,9 @@ This project focuses on fine-tuning the GPT-2 model to classify emails as spam o
 
 ## Getting Started
 
-    1- Clone the repository.
-    2- cd repo
-    3- Install required packages (pip install -r requirements.txt)
+1- Clone the repository.
+2- cd repo
+3- Install required packages (pip install -r requirements.txt)
 
 ### Training & Evaluation
 

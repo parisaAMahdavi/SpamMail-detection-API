@@ -9,7 +9,7 @@ COPY . /predict
 # Install any needed packages specified in requirements.txt
 RUN pip3 install -r requirements.txt
 # Train and test before prediction
-# RUN pip3 main.py --do_train --do_test --data_dir ./data --model_dir ./model
+# RUN python3 main.py --do_train --do_test --data_dir ./data --model_dir ./model
 # Make port 8080 available to the world outside this container
 EXPOSE 8080
 
